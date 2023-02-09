@@ -1,0 +1,1 @@
+"C:\Program Files\Google\Chrome\Application\chrome.exe" --app=http://14.160.36.114:8081/ --incognito
