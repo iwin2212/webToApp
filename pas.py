@@ -1,10 +1,31 @@
+from tendo import singleton
 import pyautogui
 import webview
 import win32gui
 import win32con
-import time
+import pygetwindow as gw
+
+
+pw = gw.getWindowsWithTitle('pas')
+print(len(pw))
+
+
+def pasWindow():
+    # kiểm tra đã có cửa sổ pas.exe hay chưa
+    if len(pw) > 0:
+        for p in pw:
+            try:
+                p.maximize()
+            except:
+                pass
+
+
+# độ phân giải màn hình
+width, height = pyautogui.size()
+
+
 # chỉ cho phép chạy 1 phiên bản (only 1 instance)
-from tendo import singleton
+pasWindow()
 me = singleton.SingleInstance()
 
 
@@ -18,17 +39,7 @@ except:
     pass
 
 
-def change_title(window):
-    """changes title every 3 seconds"""
-    for i in range(1, 100):
-        time.sleep(3)
-        window.set_title('Hệ thống phát thanh PAS AI')
-
-
-# độ phân giải màn hình
-width, height = pyautogui.size()
-
 # hiển thị dưới dạng Webview
 window = webview.create_window(
-    "PAS", "http://pas.ntoc.com.vn/", height=height, width=width)
-webview.start(change_title, window)
+    "PAS", "http://pas.ntoc.com.vn/", height=height, width=width, confirm_close=True)
+webview.start()
