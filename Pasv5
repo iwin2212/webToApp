@@ -1,0 +1,54 @@
+import pygetwindow as gw
+import ctypes
+from PyQt5.QtWidgets import QApplication, QMainWindow
+from PyQt5.QtWebEngineWidgets import QWebEngineView
+from PyQt5.QtCore import QUrl
+import sys
+
+
+def checkInstance(processes):
+    if len(processes) > 0:
+        return True
+    return False
+
+
+def pasWindow(processes):
+    if len(processes) > 0:
+        try:
+            for p in processes:
+                p.activate()
+                p.maximize()
+        except:
+            pass
+
+
+def hide_console():
+    kernel32 = ctypes.WinDLL('kernel32')
+    user32 = ctypes.WinDLL('user32')
+    SW_HIDE = 0
+    hWnd = kernel32.GetConsoleWindow()
+    user32.ShowWindow(hWnd, SW_HIDE)
+
+
+if __name__ == '__main__':
+    try:
+        title = "pas_ntoc"
+        pw = gw.getWindowsWithTitle(title)
+        if checkInstance(pw):
+            pasWindow(pw)
+        else:
+            app = QApplication(sys.argv)
+            window = QMainWindow()
+
+            view = QWebEngineView()
+            url = "http://pas.ntoc.com.vn/"
+            view.load(QUrl(url))
+            window.setCentralWidget(view)
+            window.setWindowTitle(title)
+            window.show()
+
+            pw = gw.getWindowsWithTitle(title)
+            pasWindow(pw)
+            hide_console()
+    except Exception as ex:
+        print(ex)

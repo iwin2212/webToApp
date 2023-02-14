@@ -1,0 +1,62 @@
+import wx
+import wx.html2
+import ctypes
+import psutil
+import pygetwindow as gw
+
+
+class MyBrowser(wx.Frame):
+    def __init__(self, *args, **kwds):
+        wx.Frame.__init__(self, *args, **kwds)
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        self.browser = wx.html2.WebView.New(
+            self, backend=wx.html2.WebViewBackendIE)
+        sizer.Add(self.browser, 1, wx.EXPAND, 10)
+        self.SetSizer(sizer)
+        self.Title = "pas.ntoc.com.vn"
+        self.SetName("pas.ntoc.com.vn")
+
+
+def showWebview():
+    app = wx.App()
+    dialog = MyBrowser(None, -1)
+    dialog.browser.LoadURL("http://pas.ntoc.com.vn/")
+    dialog.Show()
+    pasWindow()
+    hide_console()
+    app.MainLoop()
+
+
+def checkInstance():
+    pw = gw.getWindowsWithTitle('pas.ntoc.com.vn')
+    if len(pw) > 0:
+        return True
+    return False
+
+
+def pasWindow():
+    try:
+        pw = gw.getWindowsWithTitle('pas.ntoc.com.vn')
+        for p in pw:
+            p.activate()
+            p.maximize()
+    except:
+        pass
+
+
+def hide_console():
+    kernel32 = ctypes.WinDLL('kernel32')
+    user32 = ctypes.WinDLL('user32')
+    SW_HIDE = 0
+    hWnd = kernel32.GetConsoleWindow()
+    user32.ShowWindow(hWnd, SW_HIDE)
+
+
+if __name__ == '__main__':
+    try:
+        if checkInstance():
+            pasWindow()
+        else:
+            showWebview()
+    except Exception as ex:
+        print(ex)
