@@ -1,15 +1,16 @@
-from tendo import singleton
-import pyautogui
-import pygetwindow as gw
 import ctypes
+import os
 import sys
+from xml.dom import minidom
+
+import pygetwindow as gw
 from PyQt5.QtCore import QUrl
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtWidgets import QApplication
 
 
 def pasWindow(procs):
-    # kiểm tra đã có cửa sổ pas.exe hay chưa
+    # kiểm tra đã có cửa sổ fids.exe hay chưa
     if len(procs) > 0:
         for p in procs:
             try:
@@ -27,27 +28,33 @@ def hide_console():
     user32.ShowWindow(hWnd, SW_HIDE)
 
 
+def get_xml_data():
+    fn = '{}\configs.xml'.format(os.getcwd())
+    items = minidom.parse(fn).getElementsByTagName('item')
+    return items[0].attributes['dns'].value
+
+
 try:
-    title = "pas.ntoc.com.vn"
-    url = "http://pas.ntoc.com.vn/"
-    # độ phân giải màn hình
-    width, height = pyautogui.size()
+    title = get_xml_data()
+    url = "http://{}/".format(title)
+
     procs = gw.getWindowsWithTitle(title)
+    if procs:
+        pasWindow(procs)
+    else:
+        # hiển thị dưới dạng Webview
+        app = QApplication(sys.argv)
+        view = QWebEngineView()
+        view.load(QUrl(url))
+        view.setWindowTitle(title)
+        view.show()
 
-    # chỉ cho phép chạy 1 phiên bản (only 1 instance)
-    pasWindow(procs)
-    me = singleton.SingleInstance()
+        procs = gw.getWindowsWithTitle(title)
+        pasWindow(procs)
 
-    hide_console()
+        hide_console()
 
-    # hiển thị dưới dạng Webview
-    app = QApplication(sys.argv)
-    view = QWebEngineView()
-    view.load(QUrl(url))
-    view.setWindowTitle(title)
-    view.show()
-    procs = gw.getWindowsWithTitle(title)
-    pasWindow(procs)
-    sys.exit(app.exec_())
+        sys.exit(app.exec_())
 except Exception as ex:
     print(ex)
+    os.system("pause")
